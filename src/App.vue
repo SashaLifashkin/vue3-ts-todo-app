@@ -4,7 +4,28 @@ import { todosData } from './data/todos'
 import type { Todo } from './types/interfaces';
 
 const todos = ref<Todo[]>(todosData)
+const title = ref<string>('')
 const activeTodos = computed<Todo[]>(() => todos.value.filter(todo => !todo.completed))
+
+const getLastId = (todos: Todo[]): number => {
+  const ids: number[] = []
+
+  for (let todo of todos) {
+    ids.push(todo.id)
+  }
+
+  return Math.max(...ids);
+}
+
+const hanleSubmit = () => {
+  todos.value.push({
+    id: getLastId(todos.value) + 1,
+    title: title.value,
+    completed: false,
+  })
+
+  title.value = ''
+}
 </script>
 
 <template>
@@ -15,11 +36,12 @@ const activeTodos = computed<Todo[]>(() => todos.value.filter(todo => !todo.comp
       <header class="todoapp__header">
         <button class="todoapp__toggle-all" :class="{active: activeTodos.length === 0}"></button>
 
-        <form>
+        <form @submit.prevent="hanleSubmit">
           <input
             type="text"
             class="todoapp__new-todo"
             placeholder="What needs to be done?"
+            v-model="title"
           />
         </form>
       </header>
