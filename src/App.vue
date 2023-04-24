@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import todos from './data/todos'
+import { ref } from 'vue';
+import { todosData } from './data/todos'
+import type { Todo } from './types/interfaces';
+
+const todos = ref<Todo[]>(todosData)
 </script>
 
 <template>
@@ -22,7 +26,7 @@ import todos from './data/todos'
       <section class="todoapp__main"
       >
         <div
-          v-for="todo in todos"
+          v-for="todo, index in todos"
           :key="todo.id"
           class="todo"
           :class="{completed: todo.completed}"
@@ -31,7 +35,8 @@ import todos from './data/todos'
             <input
               type="checkbox"
               class="todo__status"
-              checked
+              :checked="todo.completed"
+              @change="todo.completed = !todo.completed"
             />
           </label>
 
@@ -48,7 +53,13 @@ import todos from './data/todos'
 
           <template v-else>
             <span class="todo__title">{{ todo.title }}</span>
-            <button class="todo__remove">x</button>
+            <button
+              class="todo__remove"
+              type="button"
+              @click="todos.splice(index, 1)"
+            >
+              x
+            </button>
           </template>
 
           <div class="modal overlay" :class="{'is-active': false}">
