@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { todosData } from './data/todos'
 import type { Todo } from './types/interfaces';
 
 const todos = ref<Todo[]>(todosData)
+const activeTodos = computed<Todo[]>(() => todos.value.filter(todo => !todo.completed))
 </script>
 
 <template>
@@ -12,7 +13,7 @@ const todos = ref<Todo[]>(todosData)
 
     <div class="todoapp__content">
       <header class="todoapp__header">
-        <button class="todoapp__toggle-all active"></button>
+        <button class="todoapp__toggle-all" :class="{active: activeTodos.length === 0}"></button>
 
         <form>
           <input
@@ -70,7 +71,7 @@ const todos = ref<Todo[]>(todosData)
 
       <footer class="todoapp__footer">
         <span class="todo-count">
-          3 items left
+          {{ activeTodos.length }} items left
         </span>
 
         <nav class="filter">
@@ -96,7 +97,7 @@ const todos = ref<Todo[]>(todosData)
           </a>
         </nav>
 
-        <button class="todoapp__clear-completed">
+        <button class="todoapp__clear-completed" v-if="activeTodos.length > 0">
           Clear completed
         </button>
       </footer>
