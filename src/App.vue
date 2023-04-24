@@ -35,8 +35,7 @@ const todos = ref<Todo[]>(todosData)
             <input
               type="checkbox"
               class="todo__status"
-              :checked="todo.completed"
-              @change="todo.completed = !todo.completed"
+              v-model="todo.completed"
             />
           </label>
 
