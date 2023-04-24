@@ -1,11 +1,27 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { todosData } from './data/todos'
 import type { Todo } from './types/interfaces';
 
-const todos = ref<Todo[]>(todosData)
+// const todos = ref<Todo[]>(todosData)
+let todos = ref<Todo[]>([])
+// const jsonData = ref<string>(localStorage.getItem('todos') || '[]')
+const jsonData = localStorage.getItem('todos') || '[]'
+try {
+  todos.value = JSON.parse(jsonData)
+} catch (e) {
+  throw new Error()
+}
+
 const title = ref<string>('')
 const activeTodos = computed<Todo[]>(() => todos.value.filter(todo => !todo.completed))
+
+watch(
+  todos.value,
+  () => {
+    localStorage.setItem('todos', JSON.stringify(todos.value))
+  }
+)
 
 const getLastId = (todos: Todo[]): number => {
   const ids: number[] = []
