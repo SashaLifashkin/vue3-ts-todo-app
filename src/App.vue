@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue'
 // import { todosData } from './data/todos'
 import type { Todo } from './types/interfaces'
 import StatusFilter from './components/StatusFilter.vue'
+import TodoItem from './components/TodoItem.vue'
 
 // const todos = ref<Todo[]>(todosData)
 let todos = ref<Todo[]>([])
@@ -66,47 +67,13 @@ const hanleSubmit = () => {
 
       <section class="todoapp__main"
       >
-        <div
+        <TodoItem
           v-for="todo, index in todos"
           :key="todo.id"
-          class="todo"
-          :class="{completed: todo.completed}"
-        >
-          <label class="todo__status-label">
-            <input
-              type="checkbox"
-              class="todo__status"
-              v-model="todo.completed"
-            />
-          </label>
-
-          <form
-            v-if="false"
-          >
-            <input
-              type="text"
-              class="todo__title-field"
-              placeholder="Empty todo will be deleted"
-              value="Todo is being edited now"
-            />
-          </form>
-
-          <template v-else>
-            <span class="todo__title">{{ todo.title }}</span>
-            <button
-              class="todo__remove"
-              type="button"
-              @click="todos.splice(index, 1)"
-            >
-              x
-            </button>
-          </template>
-
-          <div class="modal overlay" :class="{'is-active': false}">
-            <div class="modal-background has-background-white-ter"></div>
-            <div class="loader"></div>
-          </div>
-        </div>
+          :todo="todo"
+          @update="todos[index] = $event"
+          @remove="todos.splice(index, 1)"
+        />
       </section>
 
       <footer class="todoapp__footer">
