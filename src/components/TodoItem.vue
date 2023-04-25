@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Todo } from '@/types/interfaces';
+import { nextTick, reactive, ref } from 'vue';
 
 const props = defineProps<{ todo: Todo }>()
 const emit = defineEmits<{
@@ -7,11 +8,51 @@ const emit = defineEmits<{
   (e: 'remove'): void,
 }>()
 
+const state = reactive({
+  editing: false,
+  newTitle: props.todo.title,
+})
+const titleField = ref<HTMLInputElement | null>(null)
+
 function toggle() {
   emit('update', {
     ...props.todo,
     completed: !props.todo.completed
   })
+}
+
+function edit() {
+  state.newTitle = props.todo.title
+  state.editing = true
+
+  nextTick(() => {
+    titleField.value?.focus()
+  })
+}
+
+function rename() {
+  if (!state.editing) {
+    return
+  }
+
+  state.editing = false
+
+  if (state.newTitle === props.todo.title) {
+    return
+  }
+
+  if (state.newTitle === '') {
+    emit('remove')
+
+    return
+  }
+
+  emit('update', {
+    ...props.todo,
+    title: state.newTitle,
+  })
+
+  state.newTitle = ''
 }
 </script>
 
@@ -30,18 +71,27 @@ function toggle() {
     </label>
 
     <form
-      v-if="false"
+      v-if="state.editing"
+      @submit.prevent="rename"
     >
       <input
         type="text"
         class="todo__title-field"
         placeholder="Empty todo will be deleted"
-        value="Todo is being edited now"
+        v-model.trim="state.newTitle"
+        ref="titleField"
+        @keyup.esc="state.editing = false"
+        @blur="rename"
       />
     </form>
 
     <template v-else>
-      <span class="todo__title">{{ props.todo.title }}</span>
+      <span
+        class="todo__title"
+        @dblclick="edit"
+      >
+        {{ props.todo.title }}
+      </span>
       <button
         class="todo__remove"
         type="button"
