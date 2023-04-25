@@ -115,8 +115,8 @@ const hanleSubmit = () => {
         </span>
 
         <StatusFilter
-          :value="status"
-          @change="status = $event"
+          :model-value="status"
+          @update:modelValue="status = $event"
         />
 
         <button class="todoapp__clear-completed" v-if="activeTodos.length > 0">

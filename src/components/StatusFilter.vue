@@ -1,6 +1,6 @@
 <script setup lang="ts">
-const props = defineProps<{ value: string }>()
-defineEmits<{ (e: 'change', $event: string): void }>()
+const props = defineProps<{ modelValue: string }>()
+defineEmits<{ (e: 'update:modelValue', $event: string): void }>()
 </script>
 
 <template>
@@ -9,8 +9,8 @@ defineEmits<{ (e: 'change', $event: string): void }>()
     <a
       href="#/"
       class="filter__link"
-      :class="{ selected: props.value === 'all' }"
-      @click="$emit('change', 'all')"
+      :class="{ selected: props.modelValue === 'all' }"
+      @click="$emit('update:modelValue', 'all')"
     >
       All
     </a>
@@ -18,8 +18,8 @@ defineEmits<{ (e: 'change', $event: string): void }>()
     <a
       href="#/active"
       class="filter__link"
-      :class="{ selected: props.value === 'active' }"
-      @click="$emit('change', 'active')"
+      :class="{ selected: props.modelValue === 'active' }"
+      @click="$emit('update:modelValue', 'active')"
     >
       Active
     </a>
@@ -27,8 +27,8 @@ defineEmits<{ (e: 'change', $event: string): void }>()
     <a
       href="#/completed"
       class="filter__link"
-      :class="{ selected: props.value === 'completed' }"
-      @click="$emit('change', 'completed')"
+      :class="{ selected: props.modelValue === 'completed' }"
+      @click="$emit('update:modelValue', 'completed')"
     >
       Completed
     </a>
