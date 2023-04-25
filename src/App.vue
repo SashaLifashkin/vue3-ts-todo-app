@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
-import { todosData } from './data/todos'
-import type { Todo } from './types/interfaces';
+import { computed, ref, watch } from 'vue'
+// import { todosData } from './data/todos'
+import type { Todo } from './types/interfaces'
+import StatusFilter from './components/StatusFilter.vue'
 
 // const todos = ref<Todo[]>(todosData)
 let todos = ref<Todo[]>([])
@@ -14,6 +15,7 @@ try {
 }
 
 const title = ref<string>('')
+const status = ref('all')
 const activeTodos = computed<Todo[]>(() => todos.value.filter(todo => !todo.completed))
 
 watch(
@@ -112,28 +114,10 @@ const hanleSubmit = () => {
           {{ activeTodos.length }} items left
         </span>
 
-        <nav class="filter">
-          <a
-            href="#/"
-            class="filter__link selected"
-          >
-            All
-          </a>
-
-          <a
-            href="#/active"
-            class="filter__link"
-          >
-            Active
-          </a>
-
-          <a
-            href="#/completed"
-            class="filter__link"
-          >
-            Completed
-          </a>
-        </nav>
+        <StatusFilter
+          :value="status"
+          @change="status = $event"
+        />
 
         <button class="todoapp__clear-completed" v-if="activeTodos.length > 0">
           Clear completed
