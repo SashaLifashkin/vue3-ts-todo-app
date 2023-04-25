@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, type ComputedRef } from 'vue'
 // import { todosData } from './data/todos'
 import type { Todo } from './types/interfaces'
 import StatusFilter from './components/StatusFilter.vue'
@@ -18,6 +18,19 @@ try {
 const title = ref<string>('')
 const status = ref('all')
 const activeTodos = computed<Todo[]>(() => todos.value.filter(todo => !todo.completed))
+const comletedTodos = computed<Todo[]>(() => todos.value.filter(todo => todo.completed))
+const visibleTodos = computed<Todo[]>(() => {
+  switch (status.value) {
+    case 'active':
+      return activeTodos.value
+
+    case 'completed':
+      return comletedTodos.value
+
+    default:
+      return todos.value
+  }
+})
 
 watch(
   todos.value,
@@ -68,11 +81,11 @@ const hanleSubmit = () => {
       <section class="todoapp__main"
       >
         <TodoItem
-          v-for="todo, index in todos"
+          v-for="todo in visibleTodos"
           :key="todo.id"
           :todo="todo"
-          @update="todos[index] = $event"
-          @remove="todos.splice(index, 1)"
+          @update="Object.assign(todo, $event)"
+          @remove="todos.splice(todos.indexOf(todo), 1)"
         />
       </section>
 
