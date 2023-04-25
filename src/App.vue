@@ -1,19 +1,24 @@
 <script setup lang="ts">
-import { computed, ref, watch, type ComputedRef } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 // import { todosData } from './data/todos'
 import type { Todo } from './types/interfaces'
 import StatusFilter from './components/StatusFilter.vue'
 import TodoItem from './components/TodoItem.vue'
+import { createTodo, deleteTodo, getTodos, updateTodo } from './data/todos'
 
 // const todos = ref<Todo[]>(todosData)
 let todos = ref<Todo[]>([])
 // const jsonData = ref<string>(localStorage.getItem('todos') || '[]')
-const jsonData = localStorage.getItem('todos') || '[]'
-try {
-  todos.value = JSON.parse(jsonData)
-} catch (e) {
-  throw new Error()
-}
+// const jsonData = localStorage.getItem('todos') || '[]'
+// try {
+//   todos.value = JSON.parse(jsonData)
+// } catch (e) {
+//   throw new Error()
+// }
+
+onMounted(async () => {
+  todos.value = await getTodos()
+})
 
 const title = ref<string>('')
 const status = ref('all')
@@ -32,12 +37,12 @@ const visibleTodos = computed<Todo[]>(() => {
   }
 })
 
-watch(
-  todos.value,
-  () => {
-    localStorage.setItem('todos', JSON.stringify(todos.value))
-  }
-)
+// watch(
+//   todos.value,
+//   () => {
+//     localStorage.setItem('todos', JSON.stringify(todos.value))
+//   }
+// )
 
 const getLastId = (todos: Todo[]): number => {
   const ids: number[] = []
@@ -49,14 +54,39 @@ const getLastId = (todos: Todo[]): number => {
   return Math.max(...ids);
 }
 
-const hanleSubmit = () => {
-  todos.value.push({
-    id: getLastId(todos.value) + 1,
-    title: title.value,
-    completed: false,
-  })
+const hanleSubmit = async () => {
+  // const { id, title, completed } = await createTodos(title.value) // вызывает ошибку c title
+  const result = await createTodo(title.value)
 
+  // todos.value.push({ id: result.id, title: result.title, completed: result.completed })
+  todos.value.push(result)
   title.value = ''
+
+  // todos.value.push({
+  //   id: getLastId(todos.value) + 1,
+  //   title: title.value,
+  //   completed: false,
+  // })
+
+  // title.value = ''
+}
+
+// const updateTodoApi = ({ id, title, completed }: Todo) => {
+//   updateTodo({ id, title, completed }).then(
+//     (result) => {
+//       todos.value = todos.value.map(todo => todo.id !== id ? todo : result)
+//     }
+//   )
+// }
+
+const updateTodoApi = async ({ id, title, completed }: Todo) => {
+  const result = await updateTodo({ id, title, completed })
+  todos.value = todos.value.map(todo => todo.id !== id ? todo : result)
+}
+
+const removeTodo = async (id: number) => {
+  await deleteTodo(id)
+  todos.value = todos.value.filter(todo => todo.id !== id)
 }
 </script>
 
@@ -84,11 +114,11 @@ const hanleSubmit = () => {
         tag="section"
       >
         <TodoItem
-          v-for="todo in visibleTodos"
+          v-for="todo of visibleTodos"
           :key="todo.id"
           :todo="todo"
-          @update="Object.assign(todo, $event)"
-          @remove="todos.splice(todos.indexOf(todo), 1)"
+          @update="updateTodoApi"
+          @remove="removeTodo(todo.id)"
         />
       </TransitionGroup >
 
