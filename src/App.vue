@@ -78,7 +78,10 @@ const hanleSubmit = () => {
         </form>
       </header>
 
-      <section class="todoapp__main"
+      <TransitionGroup
+        class="todoapp__main"
+        name="list"
+        tag="section"
       >
         <TodoItem
           v-for="todo in visibleTodos"
@@ -87,7 +90,7 @@ const hanleSubmit = () => {
           @update="Object.assign(todo, $event)"
           @remove="todos.splice(todos.indexOf(todo), 1)"
         />
-      </section>
+      </TransitionGroup >
 
       <footer class="todoapp__footer">
         <span class="todo-count">
@@ -118,5 +121,15 @@ const hanleSubmit = () => {
 </template>
 
 <style scoped>
-
+.list-enter-active,
+.list-leave-active {
+  max-height: 60px;
+  transition: all 0.5s ease;
+}
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  max-height: 0;
+  transform: scaleY(0);
+}
 </style>
