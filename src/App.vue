@@ -143,7 +143,11 @@ const removeTodo = async (id: number) => {
       </footer>
     </div>
 
-    <ErrorMessage class="is-warning" :active="errorMessage !== ''">
+    <ErrorMessage
+      class="is-warning"
+      :active="errorMessage !== ''"
+      @hide="errorMessage = ''"
+    >
       <template #default="{ why, x}">
         <p>{{ errorMessage }} {{ why }} {{ x }}</p>
       </template>

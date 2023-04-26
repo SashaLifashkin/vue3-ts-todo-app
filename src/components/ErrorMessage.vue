@@ -1,5 +1,8 @@
 <script setup lang="ts">
 defineProps<{ active: boolean }>()
+const emit = defineEmits<{
+  (e: 'hide'): void,
+}>()
 </script>
 
 <template>
@@ -9,7 +12,7 @@ defineProps<{ active: boolean }>()
   >
     <div class="message-header">
       <slot name="header"></slot>
-      <button class="delete"></button>
+      <button class="delete" @click="emit('hide')"></button>
     </div>
 
     <div class="message-body">
