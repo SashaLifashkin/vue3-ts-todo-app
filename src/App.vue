@@ -4,6 +4,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import type { Todo } from './types/interfaces'
 import StatusFilter from './components/StatusFilter.vue'
 import TodoItem from './components/TodoItem.vue'
+import ErrorMessage  from './components/ErrorMessage.vue'
 import { createTodo, deleteTodo, getTodos, updateTodo } from './data/todos'
 
 // const todos = ref<Todo[]>(todosData)
@@ -16,12 +17,9 @@ let todos = ref<Todo[]>([])
 //   throw new Error()
 // }
 
-onMounted(async () => {
-  todos.value = await getTodos()
-})
-
 const title = ref<string>('')
 const status = ref('all')
+const errorMessage = ref('')
 const activeTodos = computed<Todo[]>(() => todos.value.filter(todo => !todo.completed))
 const comletedTodos = computed<Todo[]>(() => todos.value.filter(todo => todo.completed))
 const visibleTodos = computed<Todo[]>(() => {
@@ -34,6 +32,14 @@ const visibleTodos = computed<Todo[]>(() => {
 
     default:
       return todos.value
+  }
+})
+
+onMounted(async () => {
+  try {
+    todos.value = await getTodos().then(() => Promise.reject())
+  } catch {
+    errorMessage.value = 'Unable to load todos'
   }
 })
 
@@ -137,16 +143,14 @@ const removeTodo = async (id: number) => {
       </footer>
     </div>
 
-    <article class="message is-danger message--hidden">
-      <div class="message-header">
-        <p>Error</p>
-        <button class="delete"></button>
-      </div>
-
-      <div class="message-body">
-        Unable to add a Todo
-      </div>
-    </article>
+    <ErrorMessage class="is-warning" :active="errorMessage !== ''">
+      <template #default="{ why, x}">
+        <p>{{ errorMessage }} {{ why }} {{ x }}</p>
+      </template>
+      <template #header>
+        <p>Server Error</p>
+      </template>
+    </ErrorMessage>
   </div>
 </template>
 
