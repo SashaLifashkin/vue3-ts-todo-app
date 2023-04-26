@@ -1,22 +1,39 @@
 <script setup lang="ts">
-defineProps<{ active: boolean }>()
-const emit = defineEmits<{
-  (e: 'hide'): void,
-}>()
+import { ref } from 'vue';
+
+// defineProps<{ active: boolean }>()
+// const emit = defineEmits<{
+//   (e: 'hide'): void,
+// }>()
+
+const errorText = ref('')
+
+defineExpose({
+  hide,
+  show,
+})
+
+function hide() {
+  errorText.value = ''
+}
+
+function show(text: string) {
+  errorText.value = text
+}
 </script>
 
 <template>
   <article
     class="message"
-    :class="{ 'message--hidden': !active }"
+    :class="{ 'message--hidden': errorText === '' }"
   >
     <div class="message-header">
       <slot name="header"></slot>
-      <button class="delete" @click="emit('hide')"></button>
+      <button class="delete" @click="hide"></button>
     </div>
 
     <div class="message-body">
-      <slot why="Promise rejected" :x="502"></slot>
+      <slot :text="errorText"></slot>
     </div>
   </article>
 </template>

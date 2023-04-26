@@ -19,7 +19,8 @@ let todos = ref<Todo[]>([])
 
 const title = ref<string>('')
 const status = ref('all')
-const errorMessage = ref('')
+// const errorMessage = ref('')
+const errorMessage = ref<InstanceType<typeof ErrorMessage> | null>(null)
 const activeTodos = computed<Todo[]>(() => todos.value.filter(todo => !todo.completed))
 const comletedTodos = computed<Todo[]>(() => todos.value.filter(todo => todo.completed))
 const visibleTodos = computed<Todo[]>(() => {
@@ -39,7 +40,8 @@ onMounted(async () => {
   try {
     todos.value = await getTodos().then(() => Promise.reject())
   } catch {
-    errorMessage.value = 'Unable to load todos'
+    // errorMessage.value = 'Unable to load todos'
+    errorMessage.value?.show('Unable to load todos')
   }
 })
 
@@ -145,6 +147,18 @@ const removeTodo = async (id: number) => {
 
     <ErrorMessage
       class="is-warning"
+      ref="errorMessage"
+    >
+      <template #default="{ text }">
+        <p>{{ text }}</p>
+        <button @click="errorMessage?.hide()">X</button>
+      </template>
+      <template #header>
+        <p>Server Error</p>
+      </template>
+    </ErrorMessage>
+    <!-- <ErrorMessage
+      class="is-warning"
       :active="errorMessage !== ''"
       @hide="errorMessage = ''"
     >
@@ -154,7 +168,7 @@ const removeTodo = async (id: number) => {
       <template #header>
         <p>Server Error</p>
       </template>
-    </ErrorMessage>
+    </ErrorMessage> -->
   </div>
 </template>
 
